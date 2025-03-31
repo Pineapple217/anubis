@@ -3,8 +3,8 @@ import processSlow from "./proof-of-work-slow.mjs";
 import { testVideo } from "./video.mjs";
 
 const algorithms = {
-  "fast": processFast,
-  "slow": processSlow,
+  fast: processFast,
+  slow: processSlow,
 };
 
 // from Xeact
@@ -69,19 +69,21 @@ function showContinueBar(hash, nonce, t0, t1) {
         response: hash,
         nonce,
         redir,
-        elapsedTime: t1 - t0
+        elapsedTime: t1 - t0,
       })
     );
   };
 }
 
 (async () => {
-  const status = document.getElementById('status');
-  const image = document.getElementById('image');
-  const title = document.getElementById('title');
-  const progress = document.getElementById('progress');
-  const anubisVersion = JSON.parse(document.getElementById('anubis_version').textContent);
-  const details = document.querySelector('details');
+  const status = document.getElementById("status");
+  const image = document.getElementById("image");
+  const title = document.getElementById("title");
+  const progress = document.getElementById("progress");
+  const anubisVersion = JSON.parse(
+    document.getElementById("anubis_version").textContent
+  );
+  const details = document.querySelector("details");
   let userReadDetails = false;
 
   if (details) {
@@ -91,11 +93,11 @@ function showContinueBar(hash, nonce, t0, t1) {
       }
     });
   }
-  
+
   const ohNoes = ({ titleMsg, statusMsg, imageSrc }) => {
     title.innerHTML = titleMsg;
     status.innerHTML = statusMsg;
-    image.src = imageSrc;
+    // image.src = imageSrc;
     progress.style.display = "none";
   };
 
@@ -121,7 +123,7 @@ function showContinueBar(hash, nonce, t0, t1) {
   //   return;
   // }
 
-  status.innerHTML = 'Calculating...';
+  status.innerHTML = "Calculating...";
 
   for (const { value, name, msg } of dependencies) {
     if (!value) {
@@ -133,12 +135,15 @@ function showContinueBar(hash, nonce, t0, t1) {
     }
   }
 
-  const { challenge, rules } = await fetch("/.within.website/x/cmd/anubis/api/make-challenge", { method: "POST" })
-    .then(r => {
+  const { challenge, rules } = await fetch(
+    "/.within.website/x/cmd/anubis/api/make-challenge",
+    { method: "POST" }
+  )
+    .then((r) => {
       if (!r.ok) throw new Error("Failed to fetch config");
       return r.json();
     })
-    .catch(err => {
+    .catch((err) => {
       ohNoes({
         titleMsg: "Internal error!",
         statusMsg: `Failed to fetch challenge config: ${err.message}`,
@@ -159,7 +164,7 @@ function showContinueBar(hash, nonce, t0, t1) {
 
   status.innerHTML = `Calculating...<br/>Difficulty: ${rules.report_as}, `;
   progress.style.display = "inline-block";
-  
+
   // the whole text, including "Speed:", as a single node, because some browsers
   // (Firefox mobile) present screen readers with each node as a separate piece
   // of text.
@@ -188,7 +193,7 @@ function showContinueBar(hash, nonce, t0, t1) {
         // apply a polynomial ease-out function to move faster in the beginning
         // and then slow down as things get increasingly unlikely. quadratic felt
         // the best in testing, but this may need adjustment in the future.
-        
+
         const probability = Math.pow(1 - likelihood, iters);
         const distance = (1 - Math.pow(probability, 2)) * 100;
         progress["aria-valuenow"] = distance;
@@ -198,24 +203,24 @@ function showContinueBar(hash, nonce, t0, t1) {
           status.append(
             document.createElement("br"),
             document.createTextNode(
-              "Verification is taking longer than expected. Please do not refresh the page.",
-            ),
+              "Verification is taking longer than expected. Please do not refresh the page."
+            )
           );
           showingApology = true;
         }
-      },
+      }
     );
     const t1 = Date.now();
     console.log({ hash, nonce });
 
     title.innerHTML = "Success!";
     status.innerHTML = `Done! Took ${t1 - t0}ms, ${nonce} iterations`;
-    image.src = imageURL("happy", anubisVersion);
+    // image.src = imageURL("happy", anubisVersion);
     progress.style.display = "none";
 
     if (userReadDetails) {
       const container = document.getElementById("progress");
-    
+
       // Style progress bar as a continue button
       container.style.display = "flex";
       container.style.alignItems = "center";
@@ -231,7 +236,7 @@ function showContinueBar(hash, nonce, t0, t1) {
       container.style.width = "min(20rem, 90%)";
       container.style.margin = "1rem auto 2rem";
       container.innerHTML = "I've finished reading, continue →";
-    
+
       function onDetailsExpand() {
         const redir = window.location.href;
         window.location.replace(
@@ -239,14 +244,13 @@ function showContinueBar(hash, nonce, t0, t1) {
             response: hash,
             nonce,
             redir,
-            elapsedTime: t1 - t0
-          }),
+            elapsedTime: t1 - t0,
+          })
         );
       }
-    
+
       container.onclick = onDetailsExpand;
       setTimeout(onDetailsExpand, 30000);
-    
     } else {
       setTimeout(() => {
         const redir = window.location.href;
@@ -255,12 +259,11 @@ function showContinueBar(hash, nonce, t0, t1) {
             response: hash,
             nonce,
             redir,
-            elapsedTime: t1 - t0
-          }),
+            elapsedTime: t1 - t0,
+          })
         );
       }, 250);
     }
-    
   } catch (err) {
     ohNoes({
       titleMsg: "Calculation error!",
